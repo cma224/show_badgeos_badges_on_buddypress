@@ -1,0 +1,1 @@
+# show_badgeos_badges_on_buddypress
