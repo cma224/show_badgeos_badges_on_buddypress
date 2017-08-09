@@ -116,19 +116,10 @@ class BadgeOS_bbPress_Extension{
     public function textdomain() {
 		load_plugin_textdomain( 'bbp_private_replies', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 	}
-	
-	
-
-
-    
-    public function jc_after_topic_author() {
-     
-    }
     
     public function includes() {
         // Include files
         
-
         // Add files individually later on in like so:
         //require_once( $this->directory_path . '/includes/sample.php' );
         
@@ -160,7 +151,7 @@ class BadgeOS_bbPress_Extension{
     		    // Display our error(s)
     	
     			if(!class_exists('BadgeOS')){
-    					echo '<div id="message" class="error">';
+    				echo '<div id="message" class="error">';
     				echo '<p>' . sprintf( __( 'This plugin requires BadgeOS and has been <a href="%s">deactivated</a>. Please install and activate BadgeOS and then reactivate this plugin.', 'badgeos-addon' ), admin_url( 'plugins.php' ) ) . '</p>';
     				echo '</div>';
     			}
@@ -171,15 +162,10 @@ class BadgeOS_bbPress_Extension{
     				echo '</div>';
     			}
     			if(!class_exists('bbPress')){
-    			echo '<div id="message" class="error">';
+    				echo '<div id="message" class="error">';
     				echo '<p>' . sprintf( __( 'This plugin requires bbPress and has been <a href="%s">deactivated</a>. Please install and activate bbPress and then reactivate this plugin.', 'badgeos-addon' ), admin_url( 'plugins.php' ) ) . '</p>';
     				echo '</div>';
     			}
-    			
-    		
-
-
-    		//echo '</div>';
     
     		// Deactivate our plugin
     		deactivate_plugins( $this->basename );
