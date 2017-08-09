@@ -145,8 +145,8 @@ class BadgeOS_bbPress_Extension{
     
     public static function meets_requirements() {
         
-        // class_exists checks that BadgeOS is ACTIVE
-        if(class_exists('BadgeOS'))
+        // class_exists checks that BadgeOS, BuddyPress, and bbPress are all ACTIVE
+        if(class_exists('BadgeOS') && class_exists('BuddyPress') && class_exists('bbPress'))
             return true;
         else
             return false;
@@ -157,10 +157,29 @@ class BadgeOS_bbPress_Extension{
     public function maybe_disable_plugin() {
         		
         	if ( ! $this->meets_requirements() ) {
+    		    
+    		    // Display our error(s)
     		
-    		// Display our error
-    		echo '<div id="message" class="error">';
-    		echo '<p>' . sprintf( __( 'This plugin requires BadgeOS and has been <a href="%s">deactivated</a>. Please install and activate BadgeOS and then reactivate this plugin.', 'badgeos-addon' ), admin_url( 'plugins.php' ) ) . '</p>';
+    			if(!class_exists('BadgeOS')){
+    				echo '<div id="message" class="error">';
+    				echo '<p>' . sprintf( __( 'This plugin requires BadgeOS and has been <a href="%s">deactivated</a>. Please install and activate BadgeOS and then reactivate this plugin.', 'badgeos-addon' ), admin_url( 'plugins.php' ) ) . '</p>';
+    				echo '<div id="message" class="error">';
+    			}
+    				
+    			if(!class_exists('BuddyPress')){
+    				echo '<div id="message" class="error">';
+    				echo '<p>' . sprintf( __( 'This plugin requires BuddyPress and has been <a href="%s">deactivated</a>. Please install and activate BuddyPress and then reactivate this plugin.', 'badgeos-addon' ), admin_url( 'plugins.php' ) ) . '</p>';
+    				echo '<div id="message" class="error">';
+    			}
+    			if(!class_exists('bbPress')){
+    				echo '<div id="message" class="error">';
+    				echo '<p>' . sprintf( __( 'This plugin requires bbPress and has been <a href="%s">deactivated</a>. Please install and activate bbPress and then reactivate this plugin.', 'badgeos-addon' ), admin_url( 'plugins.php' ) ) . '</p>';
+    				echo '<div id="message" class="error">';
+    			}
+    			
+    		
+
+
     		echo '</div>';
     
     		// Deactivate our plugin
