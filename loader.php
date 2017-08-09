@@ -128,7 +128,7 @@ class Show_BadgeOS_Badges_on_bbPress{
     public static function meets_requirements() {
         
         // class_exists checks that BadgeOS, BuddyPress, and bbPress are all ACTIVE
-        if(class_exists('BadgeOS') && class_exists('BuddyPress') && class_exists('bbPress') && (wp_get_current_user=='inadvance' || wp_get_current_user=='cabello')
+        if(class_exists('BadgeOS') && class_exists('BuddyPress') && class_exists('bbPress') && (wp_get_current_user=='inadvance' || wp_get_current_user=='cabello'))
             return true;
         else
             return false;
