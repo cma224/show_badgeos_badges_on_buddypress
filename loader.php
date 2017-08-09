@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Show BadgeOS Badges on BuddyPress
+Plugin Name: Show BadgeOS Badges on bbPress
 Description: This plugin shows the badges earned by topic authors in BBPress.
 Version: 1.0.0
 Author: Cristian Abello
@@ -25,17 +25,16 @@ class BadgeOS_bbPress_Extension{
 		add_action( 'admin_notices', array( $this, 'maybe_disable_plugin' ) );
 		add_action( 'init', array( $this, 'textdomain' ) );
 	
-		add_action( 'bbp_theme_after_topic_author', array( $this, 'earnedBadges' ) );
+		add_action( 'bbp_theme_after_user_profile', array( $this, 'earnedBadgesAfterUserProfile' ) );
+		add_action( 'bbp_theme_after_reply_author_details', array( $this, 'earnedBadgesAfterReplyAuthorDetails' ) );
 		
 		// Include our other plugin files
 		add_action( 'init', array( $this, 'includes' ) );
        
 
     }
-    
-        
-    	public function earnedBadges() {
-        global $user_ID;
+    public function earnedBadgesAfterUserProfile() {
+       // global $user_ID;
 
 		echo $args['before_widget'];
 
@@ -51,8 +50,87 @@ class BadgeOS_bbPress_Extension{
 				echo '<p class="badgeos-total-points">' . sprintf( __( 'My Total Points: %s', 'badgeos' ), '<strong>' . number_format( badgeos_get_users_points() ) . '</strong>' ) . '</p>';
 			}
 
-            $topic_author = bbp_get_topic_author_id();
-			$achievements = badgeos_get_user_achievements(array('display'=>true,'user_id' => $topic_author ));
+            $reply_author = bbp_get_reply_author_id();
+			$achievements = badgeos_get_user_achievements(array('display'=>true,'user_id' => $reply ));
+
+			if ( is_array( $achievements ) && ! empty( $achievements ) ) {
+
+				$number_to_show = absint( $instance['number'] );
+				$thecount = 0;
+
+				wp_enqueue_script( 'badgeos-achievements' );
+				wp_enqueue_style( 'badgeos-widget' );
+
+				//load widget setting for achievement types to display
+				$set_achievements = ( isset( $instance['set_achievements'] ) ) ? $instance['set_achievements'] : '';
+
+				//show most recently earned achievement first
+				$achievements = array_reverse( $achievements );
+
+				echo '<ul class="widget-achievements-listing">';
+				foreach ( $achievements as $achievement ) {
+
+					//verify achievement type is set to display in the widget settings
+					//if $set_achievements is not an array it means nothing is set so show all achievements
+					if ( ! is_array( $set_achievements ) || in_array( $achievement->post_type, $set_achievements ) ) {
+
+						//exclude step CPT entries from displaying in the widget
+						if ( get_post_type( $achievement->ID ) != 'step' ) {
+
+							$permalink  = get_permalink( $achievement->ID );
+							$title      = get_the_title( $achievement->ID );
+							$img        = badgeos_get_achievement_post_thumbnail( $achievement->ID, array( 50, 50 ), 'wp-post-image' );
+							$thumb      = $img ? '<a class="badgeos-item-thumb" href="'. esc_url( $permalink ) .'">' . $img .'</a>' : '';
+							$class      = 'widget-badgeos-item-title';
+							$item_class = $thumb ? ' has-thumb' : '';
+
+							// Setup credly data if giveable
+							$giveable   = credly_is_achievement_giveable( $achievement->ID, $user_ID );
+							$item_class .= $giveable ? ' share-credly addCredly' : '';
+							$credly_ID  = $giveable ? 'data-credlyid="'. absint( $achievement->ID ) .'"' : '';
+
+							echo '<li id="widget-achievements-listing-item-'. absint( $achievement->ID ) .'" '. $credly_ID .' class="widget-achievements-listing-item'. esc_attr( $item_class ) .'">';
+							echo $thumb;
+							echo '<a class="widget-badgeos-item-title '. esc_attr( $class ) .'" href="'. esc_url( $permalink ) .'">'. esc_html( $title ) .'</a>';
+							echo '</li>';
+
+							$thecount++;
+
+							if ( $thecount == $number_to_show && $number_to_show != 0 ) {
+								break;
+							}
+
+						}
+
+					}
+				}
+
+				echo '</ul><!-- widget-achievements-listing -->';
+
+			}
+
+	}
+    	}   
+        
+    public function earnedBadgesAfterReplyAuthorDetails($reply_id) {
+       // global $user_ID;
+
+		echo $args['before_widget'];
+
+		$title = apply_filters( 'widget_title', $instance['title'] );
+
+		if ( !empty( $title ) ) { echo $args['before_title'] . $title . $args['after_title']; };
+
+		//user must be logged in to view earned badges and points
+		if ( is_user_logged_in() ) {
+
+			//display user's points if widget option is enabled
+			if ( $instance['point_total'] == 'on' ) {
+				echo '<p class="badgeos-total-points">' . sprintf( __( 'My Total Points: %s', 'badgeos' ), '<strong>' . number_format( badgeos_get_users_points() ) . '</strong>' ) . '</p>';
+			}
+		$user_id = bbp_get_reply_author_id( $reply_id );
+           // $topic_author = bbp_get_topic_author_id();
+			$achievements = badgeos_get_user_achievements(array('display'=>true,'user_id' => $user_id ));
 
 			if ( is_array( $achievements ) && ! empty( $achievements ) ) {
 
