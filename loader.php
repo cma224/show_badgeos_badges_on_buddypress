@@ -25,7 +25,7 @@ class BadgeOS_bbPress_Extension{
 		add_action( 'admin_notices', array( $this, 'maybe_disable_plugin' ) );
 		add_action( 'init', array( $this, 'textdomain' ) );
 	
-		add_action( 'bbp_theme_after_topic_author', array( $this, 'checkbox2' ) );
+		add_action( 'bbp_theme_after_topic_author', array( $this, 'earnedBadges' ) );
 		
 		// Include our other plugin files
 		add_action( 'init', array( $this, 'includes' ) );
@@ -33,10 +33,8 @@ class BadgeOS_bbPress_Extension{
 
     }
     
-        public function checkbox2(){
-            echo do_shortcode('[badgeos_achievements_list type="badges" limit="10" show_filter="true" show_search="false" orderby="menu_order" order="ASC" user_id="bbp_get_topic_author_id()" wpms="false"]');
-        }
-    	public function checkbox() {
+        
+    	public function earnedBadges() {
         global $user_ID;
 
 		echo $args['before_widget'];
@@ -114,6 +112,7 @@ class BadgeOS_bbPress_Extension{
 
 	}
     	}    
+    	
     public function textdomain() {
 		load_plugin_textdomain( 'bbp_private_replies', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 	}
@@ -159,28 +158,28 @@ class BadgeOS_bbPress_Extension{
         	if ( ! $this->meets_requirements() ) {
     		    
     		    // Display our error(s)
-    		
+    	
     			if(!class_exists('BadgeOS')){
-    				echo '<div id="message" class="error">';
+    					echo '<div id="message" class="error">';
     				echo '<p>' . sprintf( __( 'This plugin requires BadgeOS and has been <a href="%s">deactivated</a>. Please install and activate BadgeOS and then reactivate this plugin.', 'badgeos-addon' ), admin_url( 'plugins.php' ) ) . '</p>';
-    				echo '<div id="message" class="error">';
+    				echo '</div>';
     			}
     				
     			if(!class_exists('BuddyPress')){
     				echo '<div id="message" class="error">';
     				echo '<p>' . sprintf( __( 'This plugin requires BuddyPress and has been <a href="%s">deactivated</a>. Please install and activate BuddyPress and then reactivate this plugin.', 'badgeos-addon' ), admin_url( 'plugins.php' ) ) . '</p>';
-    				echo '<div id="message" class="error">';
+    				echo '</div>';
     			}
     			if(!class_exists('bbPress')){
-    				echo '<div id="message" class="error">';
+    			echo '<div id="message" class="error">';
     				echo '<p>' . sprintf( __( 'This plugin requires bbPress and has been <a href="%s">deactivated</a>. Please install and activate bbPress and then reactivate this plugin.', 'badgeos-addon' ), admin_url( 'plugins.php' ) ) . '</p>';
-    				echo '<div id="message" class="error">';
+    				echo '</div>';
     			}
     			
     		
 
 
-    		echo '</div>';
+    		//echo '</div>';
     
     		// Deactivate our plugin
     		deactivate_plugins( $this->basename );
