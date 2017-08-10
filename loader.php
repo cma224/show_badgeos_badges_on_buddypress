@@ -55,6 +55,7 @@ class Show_BadgeOS_Badges_on_bbPress{
 	
 	   $badgeHierarchy = array(
 	    	// Array format: (Badge Earned ID#, Badge Earned Name, Badge in Progress Name, Badge in Progress ID#, Baseline Badge Boolean)
+	        array(223,"TAdmiasdfasdf","",92,true),
 	        array(2420,"Fast-Track CEO","",0,true),
 	        array(2013,"CEO","",0,true),
 	        array(2008,"Director","CEO",2013,true),

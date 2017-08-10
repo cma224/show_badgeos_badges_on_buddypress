@@ -12,7 +12,8 @@ class requirementChecker{
 		
 		if($earnedAndInProgress)
 			echo '<span class="'. strtolower(str_replace(" ","-",$completedBadgeName)) .'-rank">'.$badgeInProgressName
-			.'<br>[in Progress]<br><br>'.$completedBadgeName.'</span>';
+			.'<br>'.
+			($badgeInProgressName!=''?'[in Progress]<br><br>':'<br>').$completedBadgeName.'</span>';
 	}
 	
 	public function badgeCompleted($completedID,$badgeName){
