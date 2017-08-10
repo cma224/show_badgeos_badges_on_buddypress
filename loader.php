@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Show BadgeOS Badges on bbPress
-Description: This plugin shows the (configured) badges earned by posters in BBPress.
+Description: This plugin shows the configured badges earned and in progress in BBPress underneath their respective names. CSS classes are also automatically created in accordance with the name of each specified badge.
 Version: 1.0.0
 Author: Cristian Abello
 Author URI: mailto:cristian.abello@valpo.edu
@@ -21,13 +21,11 @@ class Show_BadgeOS_Badges_on_bbPress{
 		register_activation_hook( __FILE__, array( $this, 'activate' ) );
 		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
     
-        // If BadgeOS is unavailable, deactivate our plugin
+        // If requirements are not met, deactivate our plugin
 		add_action( 'admin_notices', array( $this, 'maybe_disable_plugin' ) );
 
-        add_action('admin_init',array($this,'hideUserRoles'));
-        
         // Display configured BadgeOS badges in bbPress
-		add_action( 'bbp_theme_after_user_profile', array( $this, 'arnedBadgesAfterReplyAuthorDetails' ) );
+		add_action( 'bbp_theme_after_user_profile', array( $this, 'earnedBadges' ) );
 		
 		add_action( 'bbp_theme_after_reply_author_details', array( $this, 'earnedBadges' ) );
 		
@@ -46,76 +44,48 @@ class Show_BadgeOS_Badges_on_bbPress{
 
 		if ( !empty( $title ) ) { echo $args['before_title'] . $title . $args['after_title']; };
 
-		//user must be logged in to view earned badges and points
-	
         $user_id = bbp_get_reply_author_id( $reply_id );
 		
-	    // Admins and mentors
+	    // Admin and mentor badges
 	    if(badgeos_has_user_earned_achievement(2430, $user_id))
 			echo '<span class="admin-rank"><br>Admin</span>';
 		
 		if(badgeos_has_user_earned_achievement(2428, $user_id))
 			echo '<span class="mentor-rank"><br>Mentor</span>';
-		
-	    // Badges in progress	
-	    
-	    // Start badging as freshman/sophomore/junior/senior dependency
-		if(badgeos_has_user_earned_achievement(2243, $user_id) && !badgeos_has_user_earned_achievement(2420, $user_id))
-			echo '<span class="ft-ceo-rank"><br><br>FT CEO<br>[in Progress]<br><br></span>';
-		
-		if(badgeos_has_user_earned_achievement(2240, $user_id)
-	    && !badgeos_has_user_earned_achievement(2009, $user_id))
-			echo '<span class="ft-director-rank"><br>FT Director<br>[in Progress]<br><br></span>';
-		
-		if(badgeos_has_user_earned_achievement(2235, $user_id) && !badgeos_has_user_earned_achievement( 2012, $user_id))
-			echo '<span class="associate-rank"><br>FT Associate<br>[in Progress]<br><br></span>';
-		
-		if(badgeos_has_user_earned_achievement( 2231, $user_id) && ! badgeos_has_user_earned_achievement( 2010, $user_id))
-			echo '<span class="recruit-rank"><br>Recruit<br>[in Progress]<br><br></span>';
-		
-		if((badgeos_has_user_earned_achievement( 2008, $user_id)
-			|| badgeos_has_user_earned_achievement( 2009, $user_id) ) && ! badgeos_has_user_earned_achievement( 2013, $user_id))
-			echo '<span class="ceo-rank"><br>CEO<br>[in Progress]<br><br></span>';
-		
-		if((badgeos_has_user_earned_achievement( 2010, $user_id)
-		 ) && ! badgeos_has_user_earned_achievement( 2011, $user_id))
-			echo '<span class="associate-rank"><br>Associate<br>[in Progress]<br><br></span>';
-		
-		if(((badgeos_has_user_earned_achievement( 2011, $user_id)
-		 )||badgeos_has_user_earned_achievement( 2012, $user_id) ) && ! badgeos_has_user_earned_achievement( 2008, $user_id))
-			echo '<span class="associate-rank"><br>Director<br>[in Progress]<br><br></span>';
-		
-	    // Earned badges
-		if(badgeos_has_user_earned_achievement( 2013, $user_id))
-			echo '<span class="ceo-rank">CEO<br><br></span>';
-		
-		if(badgeos_has_user_earned_achievement( 2420, $user_id))
-			echo '<span class="ft-ceo-rank">FT CEO<br><br></span>';
-		
-		if(badgeos_has_user_earned_achievement( 2008, $user_id))
-			echo '<span class="director-rank">Director<br><br></span>';
-		
-		if(badgeos_has_user_earned_achievement( 2009, $user_id))
-			echo '<span class="ft-director-rank">FT Director<br><br></span>';
-		
-		if(badgeos_has_user_earned_achievement( 2011, $user_id))
-			echo '<span class="associate-rank">Associate<br><br></span>';
-		
-		if(badgeos_has_user_earned_achievement( 2012, $user_id))
-			echo '<span class="ft-associate-rank">FT Associate<br><br></span>';
-		
-		if(badgeos_has_user_earned_achievement( 2010, $user_id))
-			echo '<span class="recruit-rank">Recruit<br><br></span>';
 	
+	   $badgeHierarchy = array(
+	    	// Array format: (Badge Earned ID#, Badge Earned Name, Badge in Progress Name, Badge in Progress ID#, Baseline Badge Boolean)
+	        array(2420,"Fast-Track CEO","",0,true),
+	        array(2013,"CEO","",0,true),
+	        array(2008,"Director","CEO",2013,true),
+	        array(2009,"FT Director","CEO",2013,true),
+	        array(2012,"FT Associate","Director",2008,true),
+	        array(2011,"Associate","Director",2008,true),
+	        array(2010,"Recruit","Associate",2011,true),
+	        array(2231,"","Recruit",2011,false),
+	        array(2235,"","FT Associate",2012,false),
+	        array(2240,"","FT Director",2009,false),
+	        array(2243,"","FT CEO",2420,false),
+     
+	   );
+	   
+	   // Badges in progress	
+	   $rC = new requirementChecker($user_id);
+
+	   foreach($badgeHierarchy as $value)
+	    if($value[4])
+	        $rC->badgeInProgress($value[0],$value[3],$value[2],$value[1]);
+	    else
+	        $rC->badgeCompleted($value[0],$value[2],$value[1]);
+	   
 	}
-    
+	
+
     public function includes() {
         // Include files
-        
-        // Add files individually later on in like so:
-        //require_once( $this->directory_path . '/includes/sample.php' );
-        
-    }
+        require_once( $this->directory_path . '/includes/requirement-checker.php' );
+    
+        }
     
     public function activate() {
         // Fun activation stuff
@@ -128,7 +98,7 @@ class Show_BadgeOS_Badges_on_bbPress{
     public static function meets_requirements() {
         
         // class_exists checks that BadgeOS, BuddyPress, and bbPress are all ACTIVE
-        if(class_exists('BadgeOS') && class_exists('BuddyPress') && class_exists('bbPress') && (wp_get_current_user=='inadvance' || wp_get_current_user=='cabello'))
+        if(class_exists('BadgeOS') && class_exists('BuddyPress') && class_exists('bbPress'))
             return true;
         else
             return false;
