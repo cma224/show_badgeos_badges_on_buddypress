@@ -55,18 +55,18 @@ class Show_BadgeOS_Badges_on_bbPress{
 	
 	   $badgeHierarchy = array(
 	    	// Array format: (Badge Earned ID#, Badge Earned Name, Badge in Progress Name, Badge in Progress ID#, Baseline Badge Boolean)
-	        array(223,"TAdmiasdfasdf","asdf",92,true),
-	        array(2420,"Fast-Track CEO","",0,true),
-	        array(2013,"CEO","",0,true),
-	        array(2008,"Director","CEO",2013,true),
-	        array(2009,"FT Director","CEO",2013,true),
-	        array(2012,"FT Associate","Director",2008,true),
+	       
+	        array(2510,"Fast-Track CEO","",0,true),
+	        array(2507,"CEO","",0,true),
+	        array(2506,"Director","CEO",2507,true),
+	        array(2509,"FT Director","CEO",2507,true),
+	        array(2508,"FT Associate","Director",2506,true),
 	        array(2011,"Associate","Director",2008,true),
 	        array(2010,"Recruit","Associate",2011,true),
-	        array(2231,"","Recruit",2011,false),
-	        array(2235,"","FT Associate",2012,false),
-	        array(2240,"","FT Director",2009,false),
-	        array(2243,"","FT CEO",2420,false),
+	        array(2520,"","Recruit",2011,false),
+	        array(2521,"","FT Associate",2508,false),
+	        array(2522,"","FT Director",2509,false),
+	        array(2523,"","FT CEO",2510,false),
      
 	   );
 	   
